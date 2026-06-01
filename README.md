@@ -1,5 +1,9 @@
 # ai-handoff-md
 
+[![CI](https://github.com/KUKUNIK/ai-handoff-md/actions/workflows/ci.yml/badge.svg)](https://github.com/KUKUNIK/ai-handoff-md/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/ai-handoff-md.svg)](https://www.npmjs.com/package/ai-handoff-md)
+[![license](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+
 A tiny markdown convention — and a CLI validator — for handing off work between AI coding sessions. Same agent, different session. Different agents (Claude → GPT, GPT → Codex). Or you handing off to yourself tomorrow.
 
 A handoff file is just a markdown document with required frontmatter and three required sections. That's the whole spec.
