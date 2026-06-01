@@ -1,0 +1,55 @@
+{
+  "name": "ai-handoff-md",
+  "version": "0.1.0",
+  "description": "A tiny markdown convention (and CLI validator) for handing off work between AI coding sessions — Claude, GPT, Codex, or yourself.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "handoff": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "examples"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "handoff",
+    "claude",
+    "gpt",
+    "codex",
+    "markdown",
+    "frontmatter",
+    "agent",
+    "session"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "commander": "^12.1.0",
+    "kleur": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
