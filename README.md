@@ -19,7 +19,7 @@ A handoff file fixes one part of that: at the end of a session, the agent writes
 This package gives you:
 
 1. **A schema.** A small one — six frontmatter fields, three required sections, three optional sections. That's it.
-2. **A CLI validator.** `handoff validate path.md` fails fast if a section is missing or a field is wrong.
+2. **A CLI validator.** `handoff validate path.md` fails fast if a section is missing or a field is wrong, and warns when a handoff is suspiciously old (the kind of foot-gun where you re-paste a week-old `handoff.md` without realising the branch has moved on).
 3. **A prompt renderer.** `handoff render path.md` outputs a prompt prefix you can paste into any agent.
 4. **A template generator.** `handoff init` to skip the blank-page problem.
 
