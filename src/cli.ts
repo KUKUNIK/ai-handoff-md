@@ -6,7 +6,7 @@ import { renderMarkdown, renderPrompt } from "./lib/render.js";
 import { makeTemplate } from "./lib/template.js";
 import { validate } from "./lib/validate.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 
 async function main(): Promise<void> {
   const program = new Command();
@@ -68,9 +68,23 @@ async function main(): Promise<void> {
     .command("validate <path>")
     .description("validate a handoff file against the schema")
     .option("--no-color", "disable colors")
-    .action(async (path: string, opts: { color: boolean }) => {
+    .option(
+      "--stale-after <days>",
+      "warn when an in-flight handoff is older than N days (0 disables)",
+      "7",
+    )
+    .action(
+      async (
+        path: string,
+        opts: { color: boolean; staleAfter: string },
+      ) => {
       const raw = await readFile(path, "utf8");
-      const result = validate(raw);
+      const staleAfterDays = Number.parseInt(opts.staleAfter, 10);
+      if (Number.isNaN(staleAfterDays) || staleAfterDays < 0) {
+        fatal(`bad --stale-after: ${opts.staleAfter} (expected a non-negative integer)`);
+        return;
+      }
+      const result = validate(raw, { staleAfterDays });
       const useColor = opts.color !== false && Boolean(process.stdout.isTTY);
       const c = (fn: (s: string) => string, s: string) =>
         useColor ? fn(s) : s;

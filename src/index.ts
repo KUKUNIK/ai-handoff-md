@@ -1,5 +1,6 @@
 export { parseHandoff } from "./lib/parse.js";
 export { validate } from "./lib/validate.js";
+export type { ValidateOptions } from "./lib/validate.js";
 export { renderMarkdown, renderPrompt, renderFromMarkdown } from "./lib/render.js";
 export { makeTemplate } from "./lib/template.js";
 export type { TemplateInput } from "./lib/template.js";

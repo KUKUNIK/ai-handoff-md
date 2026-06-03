@@ -79,6 +79,81 @@ describe("validate", () => {
   });
 });
 
+describe("validate — stale handoff", () => {
+  it("warns when an in-flight handoff is older than --stale-after", () => {
+    const result = validate(VALID, {
+      now: new Date("2026-06-30T12:00:00Z"),
+      staleAfterDays: 7,
+    });
+    const stale = result.issues.find(
+      (i) =>
+        i.field === "created_at" &&
+        i.level === "warning" &&
+        /days old/.test(i.message),
+    );
+    expect(stale).toBeTruthy();
+    expect(stale?.message).toContain("29 days old");
+  });
+
+  it("does not warn when within the stale window", () => {
+    const result = validate(VALID, {
+      now: new Date("2026-06-04T12:00:00Z"),
+      staleAfterDays: 7,
+    });
+    expect(
+      result.issues.some(
+        (i) => i.field === "created_at" && /days old/.test(i.message),
+      ),
+    ).toBe(false);
+  });
+
+  it("does not warn when status is done, regardless of age", () => {
+    const raw = VALID.replace("status: in_progress", "status: done");
+    const result = validate(raw, {
+      now: new Date("2027-01-01T00:00:00Z"),
+      staleAfterDays: 7,
+    });
+    expect(
+      result.issues.some((i) => /days old/.test(i.message)),
+    ).toBe(false);
+  });
+
+  it("staleAfterDays: 0 disables the check", () => {
+    const result = validate(VALID, {
+      now: new Date("2030-01-01T00:00:00Z"),
+      staleAfterDays: 0,
+    });
+    expect(
+      result.issues.some((i) => /days old/.test(i.message)),
+    ).toBe(false);
+  });
+
+  it("warns when created_at is in the future (clock skew)", () => {
+    const result = validate(VALID, {
+      now: new Date("2026-01-01T00:00:00Z"),
+    });
+    expect(
+      result.issues.some(
+        (i) =>
+          i.field === "created_at" &&
+          i.level === "warning" &&
+          /future/.test(i.message),
+      ),
+    ).toBe(true);
+  });
+
+  it("skips age math when created_at is malformed (already warned separately)", () => {
+    const raw = VALID.replace(
+      "created_at: 2026-06-01T12:00:00Z",
+      "created_at: yesterday",
+    );
+    const result = validate(raw, { staleAfterDays: 7 });
+    expect(
+      result.issues.some((i) => /days old/.test(i.message)),
+    ).toBe(false);
+  });
+});
+
 describe("parseHandoff", () => {
   it("extracts sections and frontmatter", () => {
     const doc = parseHandoff(VALID);

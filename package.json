@@ -1,6 +1,6 @@
 {
   "name": "ai-handoff-md",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tiny markdown convention (and CLI validator) for handing off work between AI coding sessions — Claude, GPT, Codex, or yourself.",
   "type": "module",
   "main": "./dist/index.js",

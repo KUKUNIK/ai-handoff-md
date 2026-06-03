@@ -8,7 +8,7 @@ A tiny markdown convention — and a CLI validator — for handing off work betw
 
 A handoff file is just a markdown document with required frontmatter and three required sections. That's the whole spec.
 
-> Status: `0.1.0` — schema may shift before `1.0`.
+> Status: `0.2.0` — schema may shift before `1.0`.
 
 ## Why a "handoff" file?
 
@@ -95,6 +95,23 @@ Exit codes for `validate`:
 - `0` — valid (possibly with warnings).
 - `1` — has at least one error.
 - `2` — couldn't read / parse the file.
+
+### Staleness check
+
+`validate` warns when an in-flight handoff is older than 7 days by
+default — the kind of mistake where you re-paste a week-old
+`handoff.md` into a fresh session without realising the branch has
+already moved on. Tune or disable it with `--stale-after`:
+
+```bash
+handoff validate handoff.md                  # default: warn after 7 days
+handoff validate handoff.md --stale-after 1  # tighter — anything past a day
+handoff validate handoff.md --stale-after 0  # disable entirely
+```
+
+Done handoffs (`status: done`) are exempt — an archived handoff being
+old is the point. Future-dated `created_at` values also warn (usually
+means clock skew between two machines).
 
 ## Library
 
