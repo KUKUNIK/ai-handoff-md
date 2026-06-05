@@ -93,7 +93,8 @@ handoff render handoff.md --format markdown > handoff.normalized.md
 Exit codes for `validate`:
 
 - `0` — valid (possibly with warnings).
-- `1` — has at least one error.
+- `1` — has at least one error, **or** in `--strict` mode at least one
+  warning.
 - `2` — couldn't read / parse the file.
 
 ### Staleness check
@@ -108,6 +109,21 @@ handoff validate handoff.md                  # default: warn after 7 days
 handoff validate handoff.md --stale-after 1  # tighter — anything past a day
 handoff validate handoff.md --stale-after 0  # disable entirely
 ```
+
+### Strict mode (CI gate)
+
+`--strict` flips the exit code for warnings too. Use it in CI checks
+that should refuse to merge a handoff with *any* complaint — unknown
+sections, non-ISO timestamps, stale-after misses, future-dated clock
+skew:
+
+```bash
+handoff validate handoff.md --strict --stale-after 3
+```
+
+Same `issues` array, same level on each issue — only the verdict and
+exit code change. Errors still take precedence, so strict cannot mask
+a real error and report it as a strict-promoted warning.
 
 Done handoffs (`status: done`) are exempt — an archived handoff being
 old is the point. Future-dated `created_at` values also warn (usually
