@@ -73,10 +73,14 @@ async function main(): Promise<void> {
       "warn when an in-flight handoff is older than N days (0 disables)",
       "7",
     )
+    .option(
+      "--strict",
+      "treat warnings as errors (exit 1 if any warning is emitted)",
+    )
     .action(
       async (
         path: string,
-        opts: { color: boolean; staleAfter: string },
+        opts: { color: boolean; staleAfter: string; strict?: boolean },
       ) => {
       const raw = await readFile(path, "utf8");
       const staleAfterDays = Number.parseInt(opts.staleAfter, 10);
@@ -84,7 +88,7 @@ async function main(): Promise<void> {
         fatal(`bad --stale-after: ${opts.staleAfter} (expected a non-negative integer)`);
         return;
       }
-      const result = validate(raw, { staleAfterDays });
+      const result = validate(raw, { staleAfterDays, strict: opts.strict });
       const useColor = opts.color !== false && Boolean(process.stdout.isTTY);
       const c = (fn: (s: string) => string, s: string) =>
         useColor ? fn(s) : s;
@@ -99,9 +103,19 @@ async function main(): Promise<void> {
       if (result.ok) {
         process.stdout.write(c((s) => kleur.green(s), "ok\n"));
         process.exitCode = 0;
-      } else {
-        process.exitCode = 1;
+        return;
       }
+      const errorCount = result.issues.filter((i) => i.level === "error").length;
+      const warningCount = result.issues.filter((i) => i.level === "warning").length;
+      if (opts.strict && errorCount === 0 && warningCount > 0) {
+        process.stdout.write(
+          c(
+            (s) => kleur.red(s),
+            `strict mode: ${warningCount} warning${warningCount === 1 ? "" : "s"} promoted to errors\n`,
+          ),
+        );
+      }
+      process.exitCode = 1;
     });
 
   program

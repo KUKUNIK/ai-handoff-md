@@ -154,6 +154,50 @@ describe("validate — stale handoff", () => {
   });
 });
 
+describe("validate — strict mode", () => {
+  it("flips ok to false when strict is on and only warnings exist", () => {
+    const lenient = validate(VALID, {
+      now: new Date("2026-06-30T12:00:00Z"),
+      staleAfterDays: 7,
+    });
+    // Sanity: only the stale warning, no errors.
+    expect(lenient.issues.every((i) => i.level === "warning")).toBe(true);
+    expect(lenient.ok).toBe(true);
+
+    const strict = validate(VALID, {
+      now: new Date("2026-06-30T12:00:00Z"),
+      staleAfterDays: 7,
+      strict: true,
+    });
+    // Same issues, but ok is now false.
+    expect(strict.issues).toEqual(lenient.issues);
+    expect(strict.ok).toBe(false);
+  });
+
+  it("strict has no effect when there are no warnings", () => {
+    const result = validate(VALID, {
+      now: new Date("2026-06-04T12:00:00Z"),
+      staleAfterDays: 7,
+      strict: true,
+    });
+    expect(result.issues).toEqual([]);
+    expect(result.ok).toBe(true);
+  });
+
+  it("strict does not mask existing errors", () => {
+    const raw = VALID.replace("status: in_progress", "status: bogus");
+    const result = validate(raw, {
+      now: new Date("2026-06-04T12:00:00Z"),
+      staleAfterDays: 7,
+      strict: true,
+    });
+    expect(result.ok).toBe(false);
+    expect(
+      result.issues.some((i) => i.level === "error" && i.field === "status"),
+    ).toBe(true);
+  });
+});
+
 describe("parseHandoff", () => {
   it("extracts sections and frontmatter", () => {
     const doc = parseHandoff(VALID);

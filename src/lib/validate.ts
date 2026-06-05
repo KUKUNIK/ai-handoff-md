@@ -21,6 +21,13 @@ export interface ValidateOptions {
    * a fixed value in tests for determinism.
    */
   now?: Date;
+  /**
+   * Treat warnings as errors when computing `ok`. The `issues` array
+   * still carries the original `level` for each issue; only the boolean
+   * verdict changes. Useful in CI gates that should refuse to merge
+   * any handoff with stale-after or future-clock-skew complaints.
+   */
+  strict?: boolean;
 }
 
 export function validate(
@@ -134,5 +141,7 @@ export function validate(
   }
 
   const errors = issues.filter((i) => i.level === "error");
-  return { ok: errors.length === 0, issues };
+  const warnings = issues.filter((i) => i.level === "warning");
+  const failsStrict = options.strict === true && warnings.length > 0;
+  return { ok: errors.length === 0 && !failsStrict, issues };
 }
