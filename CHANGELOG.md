@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Added
+
+- `handoff validate --strict` (and `validate(raw, { strict })` library
+  option) treats warnings as errors when computing `ok`. The CLI exit
+  code follows `result.ok`. `issues[].level` is unchanged, so callers
+  that inspect each issue still see the original severity.
+- `docs/examples/` with two reference handoffs that pass `validate`
+  out of the box: a bugfix in_progress and a JWT-migration blocked.
+
 ## [0.2.0] - 2026-06-03
 
 ### Added
