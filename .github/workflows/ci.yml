@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18, 20, 22]
+        # Use patched runtimes for CI; package engines retain Node 18+ compatibility.
+        node-version: ["22.23.4", "24.22.1"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
